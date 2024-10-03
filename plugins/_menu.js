@@ -73,10 +73,18 @@ bot(
   },
   async (message) => {
     const { prefix, pushName, jid } = message;
+    
+    // Ensure the message contains valid text
+    if (typeof message.text !== 'string') {
+      await message.sendMessage(jid, 'Invalid message content. Please send a text-based command.');
+      return;
+    }
+
     const currentTime = new Date();
     const hours = currentTime.getHours();
     const currentDate = currentTime.toLocaleDateString('en-IN', { timeZone: TIME_ZONE });
     
+    // Determine greeting based on the time of day
     let greeting = '';
     if (hours >= 5 && hours < 12) {
       greeting = "🌸 *Good Morning* 🌸 - Time for a fresh start!";
@@ -92,6 +100,7 @@ bot(
 
     await message.sendMessage(jid, `You Are Now In The Presence OF *QUEEN ALYA 👑* Be Humbled 🙇`);
     
+    // Categorize commands
     const categorized = commands
       .filter((cmd) => cmd.pattern && !cmd.dontAddCommandList)
       .map((cmd) => ({
@@ -112,6 +121,7 @@ bot(
     menuText += `${design.lineSeparator}📅 *Date:* ${currentDate}\n`;
     menuText += `${design.lineSeparator}${greeting}\n\n`;
 
+    // Add categorized commands
     Object.keys(categorized)
       .sort()
       .forEach((category) => {
