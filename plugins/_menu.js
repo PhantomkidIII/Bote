@@ -1,11 +1,6 @@
 const os = require('os');
-const fs = require('fs');
-const path = require('path');
 const { bot, Mode, runtime, commands } = require('../lib');
 const { TIME_ZONE } = require('../config');
-
-// Path to the local image
-const imagePath = path.join(__dirname, '../lib/alya.jpg');
 
 // Dynamic design configurations
 let currentDesignIndex = 0;
@@ -73,7 +68,7 @@ bot(
   },
   async (message) => {
     const { prefix, pushName, jid } = message;
-    
+
     // Ensure the message contains valid text
     if (typeof message.text !== 'string') {
       await message.sendMessage(jid, 'Invalid message content. Please send a text-based command.');
@@ -83,7 +78,7 @@ bot(
     const currentTime = new Date();
     const hours = currentTime.getHours();
     const currentDate = currentTime.toLocaleDateString('en-IN', { timeZone: TIME_ZONE });
-    
+
     // Determine greeting based on the time of day
     let greeting = '';
     if (hours >= 5 && hours < 12) {
@@ -99,7 +94,7 @@ bot(
     const design = getNextMenuDesign();
 
     await message.sendMessage(jid, `You Are Now In The Presence OF *QUEEN ALYA 👑* Be Humbled 🙇`);
-    
+
     // Categorize commands
     const categorized = commands
       .filter((cmd) => cmd.pattern && !cmd.dontAddCommandList)
@@ -132,22 +127,6 @@ bot(
 
     menuText += `\n${design.footer}\n`;
 
-    // Check if the image file exists and read it asynchronously
-    if (!fs.existsSync(imagePath)) {
-      return await message.sendMessage(jid, 'Image file not found.');
-    }
-
-    fs.readFile(imagePath, async (error, imageBuffer) => {
-      if (error) {
-        return await message.sendMessage(jid, 'Error loading the image.');
-      }
-
-      const menuOptions = {
-        image: imageBuffer,
-        caption: '```' + menuText.trim() + '```'
-      };
-
-      await message.sendMessage(jid, menuOptions);
-    });
+    await message.sendMessage(jid, '```' + menuText.trim() + '```');
   }
 );
