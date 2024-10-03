@@ -1,11 +1,11 @@
 const os = require('os');
-const fs = require('fs'); // Add 'fs' to read the image file
-const path = require('path'); // Add 'path' to manage file paths
+const fs = require('fs');
+const path = require('path');
 const { bot, Mode, runtime, commands } = require('../lib');
 const { TIME_ZONE } = require('../config');
 
 // Path to the local image
-const imagePath =('../lib/alya.jpg');
+const imagePath = path.join(__dirname, '../lib/alya.jpg');
 
 // Dynamic design configurations
 let currentDesignIndex = 0;
@@ -38,7 +38,6 @@ function getNextMenuDesign() {
     }
   ];
 
-  // Get the current design and rotate to the next one
   const design = designs[currentDesignIndex];
   currentDesignIndex = (currentDesignIndex + 1) % designs.length;
   return design;
@@ -78,7 +77,6 @@ bot(
     const hours = currentTime.getHours();
     const currentDate = currentTime.toLocaleDateString('en-IN', { timeZone: TIME_ZONE });
     
-    // Determine greeting based on the time of day
     let greeting = '';
     if (hours >= 5 && hours < 12) {
       greeting = "🌸 *Good Morning* 🌸 - Time for a fresh start!";
@@ -90,13 +88,10 @@ bot(
       greeting = "🌙 *Good Night* 🌙 - Rest and recharge!";
     }
 
-    // Select the design for the menu
     const design = getNextMenuDesign();
 
-    // Loading message
     await message.sendMessage(jid, `You Are Now In The Presence OF *QUEEN ALYA 👑* Be Humbled 🙇`);
     
-    // Categorize commands
     const categorized = commands
       .filter((cmd) => cmd.pattern && !cmd.dontAddCommandList)
       .map((cmd) => ({
@@ -108,7 +103,6 @@ bot(
         return acc;
       }, {});
 
-    // Build the menu content
     let menuText = `${design.header}`;
     menuText += `${design.lineSeparator}👑 *User:* ${pushName}\n`;
     menuText += `${design.lineSeparator}💻 *OS:* ${getOS()}\n`;
@@ -118,7 +112,6 @@ bot(
     menuText += `${design.lineSeparator}📅 *Date:* ${currentDate}\n`;
     menuText += `${design.lineSeparator}${greeting}\n\n`;
 
-    // Add categorized commands
     Object.keys(categorized)
       .sort()
       .forEach((category) => {
@@ -129,19 +122,22 @@ bot(
 
     menuText += `\n${design.footer}\n`;
 
-    // Read the local image file
-    let imageBuffer;
-    try {
-      imageBuffer = fs.readFileSync(imagePath); // Read the local image
-    } catch (error) {
-      return await message.sendMessage(jid, 'Error loading the image.');
+    // Check if the image file exists and read it asynchronously
+    if (!fs.existsSync(imagePath)) {
+      return await message.sendMessage(jid, 'Image file not found.');
     }
 
-    // Send the menu with the local image
-    const menuOptions = {
-      image: imageBuffer,
-      caption: '```' + menuText.trim() + '```'
-    };
-    await message.sendMessage(jid, menuOptions);
+    fs.readFile(imagePath, async (error, imageBuffer) => {
+      if (error) {
+        return await message.sendMessage(jid, 'Error loading the image.');
+      }
+
+      const menuOptions = {
+        image: imageBuffer,
+        caption: '```' + menuText.trim() + '```'
+      };
+
+      await message.sendMessage(jid, menuOptions);
+    });
   }
 );
