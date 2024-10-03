@@ -9,6 +9,14 @@ bot(
   type: 'message',
  },
  async (message, match, m) => {
+  
+  // First, send the image message
+  await message.sendMessage(message.jid, {
+    image: { url: 'https://i.imgur.com/Y0pLkKX.jpeg' },  // Replace with the actual image URL
+    caption: 'Here is an image before the interactive message'
+  });
+
+  // Then, send the interactive button message
   let data = {
    jid: message.jid,
    button: [
@@ -76,9 +84,7 @@ bot(
    header: {
     title: 'X-Asena',
     subtitle: 'WhatsApp Bot',
-    hasMediaAttachment: true,
-    mediaType: 'image',  // Define the media type
-    mediaUrl: 'https://i.imgur.com/Y0pLkKX.jpeg', // Link to your image
+    hasMediaAttachment: false,  // Media attachments not allowed here
    },
    footer: {
     text: 'Interactive Native Flow Message',
