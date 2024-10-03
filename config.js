@@ -1,0 +1,42 @@
+const { Sequelize } = require('sequelize');
+require('dotenv').config();
+const toBool = (x) => x === 'true';
+const DATABASE_URL = process.env.DATABASE_URL || './bot.db';
+
+module.exports = {
+ LOGS: toBool(process.env.LOGS) || true,
+ SESSION_ID: process.env.SESSION_ID || '',
+ SUDO: process.env.SUDO || '',
+ HANDLERS: process.env.HANDLER === 'false' || process.env.HANDLER === 'null' ? '^' : '[.]',
+ RMBG_KEY: process.env.RMBG_KEY || '',
+ BRANCH: 'master',
+ WARN_COUNT: 3,
+ AUTHOR: process.env.AUTHOR || '',
+ PACKNAME: process.env.PACKNAME || '',
+ WELCOME_MSG: process.env.WELCOME_MSG || 'Hi @user Welcome to @gname',
+ GOODBYE_MSG: process.env.GOODBYE_MSG || '@user It was Nice Seeing you',
+ AUTO_READ: toBool(process.env.AUTO_READ) || false,
+ AUTO_STATUS_READ: toBool(process.env.AUTO_STATUS_READ) || false,
+ WORK_TYPE: process.env.WORK_TYPE || 'private',
+ DELETED_LOG: toBool(process.env.DELETED_LOG) || true,
+ DELETED_LOG_CHAT: process.env.DELETED_LOG_CHAT || true,
+ TIME_ZONE: process.env.TZ || 'Africa/Lagos',
+ DATABASE_URL: DATABASE_URL,
+ DATABASE:
+  DATABASE_URL === './bot.db'
+   ? new Sequelize({
+      dialect: 'sqlite',
+      storage: DATABASE_URL,
+      logging: false,
+     })
+   : new Sequelize(DATABASE_URL, {
+      dialect: 'postgres',
+      ssl: true,
+      protocol: 'postgres',
+      dialectOptions: {
+       native: true,
+       ssl: { require: true, rejectUnauthorized: false },
+      },
+      logging: false,
+     }),
+};
