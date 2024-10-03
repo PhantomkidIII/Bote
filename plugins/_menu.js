@@ -1,7 +1,11 @@
 const os = require('os');
-const axios = require('axios'); // Add axios to download the image
+const fs = require('fs'); // Add 'fs' to read the image file
+const path = require('path'); // Add 'path' to manage file paths
 const { bot, Mode, runtime, commands } = require('../lib');
 const { TIME_ZONE } = require('../config');
+
+// Path to the local image
+const imagePath =('../lib/alya.jpg');
 
 // Dynamic design configurations
 let currentDesignIndex = 0;
@@ -125,17 +129,15 @@ bot(
 
     menuText += `\n${design.footer}\n`;
 
-    // Fetch the menu image
-    const imageUrl = 'https://i.imgur.com/Y0pLkKX.jpeg';
+    // Read the local image file
     let imageBuffer;
     try {
-      const response = await axios.get(imageUrl, { responseType: 'arraybuffer' });
-      imageBuffer = response.data;
+      imageBuffer = fs.readFileSync(imagePath); // Read the local image
     } catch (error) {
-      return await message.sendMessage(jid, 'Error fetching the image.');
+      return await message.sendMessage(jid, 'Error loading the image.');
     }
 
-    // Send the menu with the image
+    // Send the menu with the local image
     const menuOptions = {
       image: imageBuffer,
       caption: '```' + menuText.trim() + '```'
